@@ -471,7 +471,7 @@
       autocorrect="off"
       autocapitalize="off"
       spellcheck="false"
-      placeholder="Buscar CID, doença ou descrição…"
+      placeholder="Buscar por código CID ou nome da doença…"
       aria-label="Buscar CID-11"
     >
     <button class="clear-btn" id="clear-btn" aria-label="Limpar busca">
@@ -493,7 +493,7 @@
   <div id="welcome-state" style="display:none">
     <div class="welcome-icon">🏥</div>
     <h2>Busca CID-11 em Português</h2>
-    <p>Pesquise por código CID, nome da doença ou descrição clínica na Classificação Internacional de Doenças — 11ª Revisão.</p>
+    <p>Pesquise por código CID ou nome da doença na Classificação Internacional de Doenças — 11ª Revisão.</p>
     <div class="stat-chips" id="stat-chips"></div>
   </div>
 
@@ -633,7 +633,7 @@
 
     return allItems.filter(item => {
       const haystack = normalize(
-        [item.name, item.cid || '', item.description, ...item.path].join(' ')
+        [item.name, item.cid || ''].join(' ')
       );
       return terms.every(t => haystack.includes(t));
     });
@@ -645,10 +645,8 @@
     const terms = normalize(query).split(/\s+/).filter(Boolean);
     if (!terms.length) return escHtml(text);
 
-    // Build regex that matches accented variants
     let result = escHtml(text);
     for (const term of terms) {
-      // Simple approach: match normalized form positions
       const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
       result = result.replace(re, m => `<mark>${m}</mark>`);
     }
@@ -704,7 +702,7 @@
 
     const nameHtml = highlight(item.name, query);
     const descPreview = item.description
-      ? `<div class="card-desc-preview">${highlight(item.description.slice(0, 220), query)}${item.description.length > 220 ? '…' : ''}</div>`
+      ? `<div class="card-desc-preview">${escHtml(item.description.slice(0, 220))}${item.description.length > 220 ? '…' : ''}</div>`
       : '';
 
     // Breadcrumb (show last 3 path items)
@@ -798,7 +796,6 @@
   loadMoreBtn.addEventListener('click', () => {
     displayCount += PAGE_SIZE;
     renderCards(searchInput.value.trim());
-    // Scroll to newly loaded content area
   });
 
   // ── Boot ───────────────────────────────────────────
