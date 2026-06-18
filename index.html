@@ -633,7 +633,7 @@
 
     return allItems.filter(item => {
       const haystack = normalize(
-        [item.name, item.cid || '', item.description, ...item.path].join(' ')
+        [item.name, item.cid || ''].join(' ')
       );
       return terms.every(t => haystack.includes(t));
     });
