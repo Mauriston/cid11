@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CID-11 — Busca em Português</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1976d2;
+      --primary-dark: #1565c0;
+      --primary-light: #e3f2fd;
+      --surface: #ffffff;
+      --background: #f5f5f5;
+      --on-primary: #ffffff;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --border: #e0e0e0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      --shadow-hover: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+      --radius: 8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ─────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      padding: 12px 16px 14px;
+    }
+
+    .header-title {
+      color: var(--on-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-title svg {
+      flex-shrink: 0;
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-secondary);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    #search-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 44px 0 44px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      background: var(--surface);
+      color: var(--text-primary);
+      outline: none;
+      transition: box-shadow 0.2s;
+    }
+
+    #search-input:focus {
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+    }
+
+    #search-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: background 0.15s;
+      display: none;
+    }
+
+    .clear-btn:hover { background: var(--border); }
+    .clear-btn.visible { display: flex; }
+
+    /* ── MAIN CONTENT ───────────────────────────────── */
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* ── STATUS BAR ─────────────────────────────────── */
+    #status-bar {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── LOADING ────────────────────────────────────── */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 16px;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* ── PROGRESS BAR ───────────────────────────────── */
+    #progress-bar {
+      width: 100%;
+      height: 3px;
+      background: transparent;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 200;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: var(--on-primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* ── RESULTS ────────────────────────────────────── */
+    #results {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── CARD ───────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.1s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card:active { transform: scale(0.995); }
+
+    .card-header {
+      padding: 14px 16px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-height: 44px;
+    }
+
+    .cid-badge {
+      flex-shrink: 0;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      font-family: 'Courier New', monospace;
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+
+    .cid-badge.category {
+      background: #546e7a;
+      font-size: 0.7rem;
+      letter-spacing: 0.3px;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .expand-icon {
+      flex-shrink: 0;
+      color: var(--text-secondary);
+      transition: transform 0.2s;
+      margin-top: 2px;
+    }
+
+    .card.expanded .expand-icon { transform: rotate(180deg); }
+
+    .card-breadcrumb {
+      padding: 0 16px 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .breadcrumb-item {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      background: #f5f5f5;
+      padding: 2px 7px;
+      border-radius: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+
+    .breadcrumb-sep {
+      font-size: 0.7rem;
+      color: var(--border);
+    }
+
+    .card-desc-preview {
+      padding: 0 16px 14px;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── EXPANDED DETAILS ───────────────────────────── */
+    .card-details {
+      display: none;
+      border-top: 1px solid var(--border);
+      padding: 14px 16px;
+      background: #fafafa;
+    }
+
+    .card.expanded .card-details { display: block; }
+
+    .detail-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      margin-top: 12px;
+    }
+
+    .detail-label:first-child { margin-top: 0; }
+
+    .detail-value {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .detail-cid {
+      font-family: 'Courier New', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .detail-path {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .path-item {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .path-sep {
+      color: var(--border);
+      font-size: 0.75rem;
+    }
+
+    /* ── EMPTY STATE ────────────────────────────────── */
+    #empty-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 16px;
+      gap: 12px;
+      text-align: center;
+    }
+
+    #empty-state.visible { display: flex; }
+
+    .empty-icon {
+      font-size: 3rem;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .empty-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+
+    /* ── WELCOME STATE ──────────────────────────────── */
+    #welcome-state {
+      text-align: center;
+      padding: 40px 16px;
+    }
+
+    #welcome-state .welcome-icon {
+      font-size: 3.5rem;
+      margin-bottom: 12px;
+    }
+
+    #welcome-state h2 {
+      color: var(--primary);
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+
+    #welcome-state p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .stat-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .stat-chip {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    /* ── HIGHLIGHT ──────────────────────────────────── */
+    mark {
+      background: #fff176;
+      color: inherit;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* ── LOAD MORE ──────────────────────────────────── */
+    #load-more {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px;
+      background: var(--surface);
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    #load-more:hover {
+      background: var(--primary-light);
+    }
+
+    #load-more.visible { display: block; }
+
+    /* ── DESKTOP ────────────────────────────────────── */
+    @media (min-width: 600px) {
+      header { padding: 16px 24px 18px; }
+      .header-title { font-size: 1.2rem; margin-bottom: 12px; }
+      main { padding: 20px 24px; }
+    }
+
+    @media (min-width: 800px) {
+      header { padding: 16px 32px 18px; }
+      main { padding: 24px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<header>
+  <div class="header-title">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+    </svg>
+    CID-11 em Português
+  </div>
+  <div class="search-box">
+    <div class="search-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <input
+      id="search-input"
+      type="search"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      placeholder="Buscar CID, doença ou descrição…"
+      aria-label="Buscar CID-11"
+    >
+    <button class="clear-btn" id="clear-btn" aria-label="Limpar busca">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div id="status-bar"></div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Carregando base CID-11…</div>
+  </div>
+
+  <div id="welcome-state" style="display:none">
+    <div class="welcome-icon">🏥</div>
+    <h2>Busca CID-11 em Português</h2>
+    <p>Pesquise por código CID, nome da doença ou descrição clínica na Classificação Internacional de Doenças — 11ª Revisão.</p>
+    <div class="stat-chips" id="stat-chips"></div>
+  </div>
+
+  <div id="empty-state">
+    <div class="empty-icon">🔍</div>
+    <div class="empty-title">Nenhum resultado encontrado</div>
+    <div class="empty-subtitle" id="empty-subtitle">Tente outros termos de busca</div>
+  </div>
+
+  <div id="results"></div>
+  <button id="load-more">Carregar mais resultados</button>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── State ──────────────────────────────────────────
+  let allItems = [];      // flattened items
+  let filtered = [];      // current filtered list
+  let displayCount = 30;  // how many cards are shown
+  const PAGE_SIZE = 30;
+
+  // ── DOM refs ───────────────────────────────────────
+  const searchInput   = document.getElementById('search-input');
+  const clearBtn      = document.getElementById('clear-btn');
+  const loadingEl     = document.getElementById('loading');
+  const welcomeEl     = document.getElementById('welcome-state');
+  const emptyEl       = document.getElementById('empty-state');
+  const emptySubEl    = document.getElementById('empty-subtitle');
+  const resultsEl     = document.getElementById('results');
+  const statusBar     = document.getElementById('status-bar');
+  const loadMoreBtn   = document.getElementById('load-more');
+  const progressFill  = document.getElementById('progress-fill');
+  const statChips     = document.getElementById('stat-chips');
+
+  // ── Flatten hierarchy ──────────────────────────────
+  function flattenData(obj, path) {
+    const items = [];
+    for (const name of Object.keys(obj)) {
+      const node = obj[name];
+      if (!node || typeof node !== 'object') continue;
+
+      const cid = (node.cid !== null && node.cid !== undefined && !Number.isNaN(node.cid))
+        ? String(node.cid).trim()
+        : null;
+      const desc = (node.description !== null && node.description !== undefined && !Number.isNaN(node.description))
+        ? String(node.description).trim()
+        : '';
+
+      const item = {
+        name: name.trim(),
+        cid,
+        description: desc,
+        path: [...path],
+      };
+
+      items.push(item);
+
+      if (node.subitens && typeof node.subitens === 'object') {
+        const children = flattenData(node.subitens, [...path, name.trim()]);
+        for (const c of children) items.push(c);
+      }
+    }
+    return items;
+  }
+
+  // ── Load data ──────────────────────────────────────
+  async function loadData() {
+    try {
+      progressFill.style.width = '20%';
+      const resp = await fetch('./data.json');
+      progressFill.style.width = '60%';
+
+      const text = await resp.text();
+      progressFill.style.width = '80%';
+
+      // Replace bare NaN (Python artifact) with null
+      const sanitized = text.replace(/:\s*NaN\b/g, ': null');
+      const data = JSON.parse(sanitized);
+
+      progressFill.style.width = '95%';
+      allItems = flattenData(data, []);
+      progressFill.style.width = '100%';
+
+      setTimeout(() => { progressFill.style.width = '0%'; }, 400);
+
+      // Stats
+      const withCid = allItems.filter(i => i.cid).length;
+      statChips.innerHTML = [
+        `${allItems.length.toLocaleString('pt-BR')} itens`,
+        `${withCid.toLocaleString('pt-BR')} com código CID`,
+      ].map(s => `<span class="stat-chip">${s}</span>`).join('');
+
+      showWelcome();
+    } catch (err) {
+      loadingEl.innerHTML = `<div style="color:#c62828;text-align:center;padding:16px">
+        <strong>Erro ao carregar data.json</strong><br>
+        <small>${err.message}</small>
+      </div>`;
+    }
+  }
+
+  // ── UI State helpers ───────────────────────────────
+  function showWelcome() {
+    loadingEl.style.display  = 'none';
+    welcomeEl.style.display  = 'block';
+    emptyEl.classList.remove('visible');
+    loadMoreBtn.classList.remove('visible');
+    statusBar.textContent = '';
+  }
+
+  function showEmpty(query) {
+    welcomeEl.style.display = 'none';
+    emptyEl.classList.add('visible');
+    emptySubEl.textContent = `Nenhum resultado para "${query}"`;
+    loadMoreBtn.classList.remove('visible');
+    statusBar.textContent = '';
+  }
+
+  function showResults(query) {
+    welcomeEl.style.display = 'none';
+    emptyEl.classList.remove('visible');
+  }
+
+  // ── Search ─────────────────────────────────────────
+  function normalize(s) {
+    return s.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9\s.]/g, ' ');
+  }
+
+  function search(query) {
+    const q = normalize(query);
+    const terms = q.split(/\s+/).filter(Boolean);
+    if (!terms.length) return allItems.slice();
+
+    return allItems.filter(item => {
+      const haystack = normalize(
+        [item.name, item.cid || '', item.description, ...item.path].join(' ')
+      );
+      return terms.every(t => haystack.includes(t));
+    });
+  }
+
+  // ── Highlight ──────────────────────────────────────
+  function highlight(text, query) {
+    if (!query || !text) return escHtml(text || '');
+    const terms = normalize(query).split(/\s+/).filter(Boolean);
+    if (!terms.length) return escHtml(text);
+
+    // Build regex that matches accented variants
+    let result = escHtml(text);
+    for (const term of terms) {
+      // Simple approach: match normalized form positions
+      const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      result = result.replace(re, m => `<mark>${m}</mark>`);
+    }
+    return result;
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Render cards ───────────────────────────────────
+  function renderCards(query) {
+    const slice = filtered.slice(0, displayCount);
+    const frag = document.createDocumentFragment();
+
+    for (const item of slice) {
+      const card = buildCard(item, query);
+      frag.appendChild(card);
+    }
+
+    resultsEl.innerHTML = '';
+    resultsEl.appendChild(frag);
+
+    // Load more
+    if (filtered.length > displayCount) {
+      loadMoreBtn.textContent = `Carregar mais (${filtered.length - displayCount} restantes)`;
+      loadMoreBtn.classList.add('visible');
+    } else {
+      loadMoreBtn.classList.remove('visible');
+    }
+
+    // Status
+    if (query) {
+      statusBar.textContent =
+        filtered.length === 0
+          ? ''
+          : `${filtered.length.toLocaleString('pt-BR')} resultado${filtered.length !== 1 ? 's' : ''}`;
+    } else {
+      statusBar.textContent = '';
+    }
+  }
+
+  function buildCard(item, query) {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const badgeClass = item.cid ? 'cid-badge' : 'cid-badge category';
+    const badgeText  = item.cid ? escHtml(item.cid) : 'CAT';
+
+    const nameHtml = highlight(item.name, query);
+    const descPreview = item.description
+      ? `<div class="card-desc-preview">${highlight(item.description.slice(0, 220), query)}${item.description.length > 220 ? '…' : ''}</div>`
+      : '';
+
+    // Breadcrumb (show last 3 path items)
+    const pathSlice = item.path.slice(-3);
+    const breadcrumbHtml = pathSlice.length
+      ? `<div class="card-breadcrumb">${
+          pathSlice.map((p, i) =>
+            (i > 0 ? '<span class="breadcrumb-sep">›</span>' : '') +
+            `<span class="breadcrumb-item" title="${escHtml(p)}">${escHtml(p)}</span>`
+          ).join('')
+        }</div>`
+      : '';
+
+    // Full path in details
+    const fullPathHtml = item.path.length
+      ? item.path.map(p => `<span class="path-item">${escHtml(p)}</span>`).join('<span class="path-sep"> › </span>')
+      : '<span style="color:var(--text-secondary);font-size:0.85rem">Categoria raiz</span>';
+
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="${badgeClass}">${badgeText}</span>
+        <span class="card-name">${nameHtml}</span>
+        <svg class="expand-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      ${breadcrumbHtml}
+      ${descPreview}
+      <div class="card-details">
+        ${item.cid ? `<div class="detail-label">Código CID-11</div><div class="detail-value detail-cid">${escHtml(item.cid)}</div>` : ''}
+        <div class="detail-label">Nome</div>
+        <div class="detail-value">${escHtml(item.name)}</div>
+        ${item.description ? `<div class="detail-label">Descrição</div><div class="detail-value">${escHtml(item.description)}</div>` : ''}
+        <div class="detail-label">Hierarquia</div>
+        <div class="detail-value detail-path">${fullPathHtml}</div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      card.classList.toggle('expanded');
+    });
+
+    return card;
+  }
+
+  // ── Debounce ───────────────────────────────────────
+  let debounceTimer;
+  function debounce(fn, delay) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(fn, delay);
+  }
+
+  // ── Search handler ─────────────────────────────────
+  function handleSearch() {
+    const query = searchInput.value.trim();
+
+    clearBtn.classList.toggle('visible', query.length > 0);
+
+    if (!query) {
+      displayCount = PAGE_SIZE;
+      resultsEl.innerHTML = '';
+      loadMoreBtn.classList.remove('visible');
+      showWelcome();
+      return;
+    }
+
+    filtered = search(query);
+    displayCount = PAGE_SIZE;
+
+    if (filtered.length === 0) {
+      resultsEl.innerHTML = '';
+      showEmpty(query);
+    } else {
+      showResults(query);
+      renderCards(query);
+    }
+  }
+
+  // ── Event listeners ────────────────────────────────
+  searchInput.addEventListener('input', () => {
+    debounce(handleSearch, 200);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    clearBtn.classList.remove('visible');
+    searchInput.focus();
+    handleSearch();
+  });
+
+  loadMoreBtn.addEventListener('click', () => {
+    displayCount += PAGE_SIZE;
+    renderCards(searchInput.value.trim());
+    // Scroll to newly loaded content area
+  });
+
+  // ── Boot ───────────────────────────────────────────
+  loadData();
+
+})();
+</script>
+</body>
+</html>
