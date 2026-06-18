@@ -250,7 +250,6 @@
       overflow: hidden;
     }
 
-    /* When expanded, hide preview and breadcrumb */
     .card.expanded .card-desc-preview { display: none; }
     .card.expanded .card-breadcrumb   { display: none; }
 
@@ -479,6 +478,23 @@
   const COPY_ICON  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
   const CHECK_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 
+  // ── Normalizers ────────────────────────────────────
+  // Strips accents and lowercases (for accent-insensitive matching)
+  function stripAccents(s) {
+    return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  // Lowercases only, keeps accents (for accent-sensitive matching)
+  function lowerOnly(s) {
+    return s.toLowerCase();
+  }
+
+  // Returns true if the string contains at least one accented character
+  function hasAccents(s) {
+    return s.normalize('NFD') !== s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  // ── Data ───────────────────────────────────────────
   function flattenData(obj, path) {
     const items = [];
     for (const name of Object.keys(obj)) {
@@ -520,6 +536,7 @@
     }
   }
 
+  // ── UI helpers ─────────────────────────────────────
   function showWelcome() {
     loadingEl.style.display = 'none';
     welcomeEl.style.display = 'block';
@@ -541,21 +558,32 @@
     emptyEl.classList.remove('visible');
   }
 
-  function normalize(s) {
-    return s.toLowerCase()
-      .normalize('NFD').replace(/[̀-ͯ]/g, '')
-      .replace(/[^a-z0-9\s.]/g, ' ');
-  }
-
+  // ── Search ─────────────────────────────────────────
+  // Each term is matched independently:
+  //   - term WITH accents  → accent-sensitive (exact lowercase match)
+  //   - term WITHOUT accents → accent-insensitive (matches accented and plain)
   function search(query) {
-    const terms = normalize(query).split(/\s+/).filter(Boolean);
+    const terms = query.trim().split(/\s+/).filter(Boolean);
     if (!terms.length) return allItems.slice();
+
     return allItems.filter(item => {
-      const h = normalize([item.name, item.cid || ''].join(' '));
-      return terms.every(t => h.includes(t));
+      const haystack     = [item.name, item.cid || ''].join(' ');
+      const haystackLow  = lowerOnly(haystack);     // accents preserved
+      const haystackFlat = stripAccents(haystack);  // accents stripped
+
+      return terms.every(term => {
+        if (hasAccents(term)) {
+          // User typed an accented character: require exact accent match
+          return haystackLow.includes(lowerOnly(term));
+        } else {
+          // User typed without accents: match both accented and plain forms
+          return haystackFlat.includes(stripAccents(term));
+        }
+      });
     });
   }
 
+  // ── HTML helpers ───────────────────────────────────
   function escHtml(s) {
     return String(s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -564,16 +592,18 @@
 
   function highlight(text, query) {
     if (!query || !text) return escHtml(text || '');
-    const terms = normalize(query).split(/\s+/).filter(Boolean);
+    const terms = query.trim().split(/\s+/).filter(Boolean);
     if (!terms.length) return escHtml(text);
     let result = escHtml(text);
     for (const term of terms) {
-      const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(escaped, 'gi');
       result = result.replace(re, m => `<mark>${m}</mark>`);
     }
     return result;
   }
 
+  // ── Render ─────────────────────────────────────────
   function renderCards(query) {
     const slice = filtered.slice(0, displayCount);
     const frag = document.createDocumentFragment();
@@ -660,6 +690,7 @@
     return card;
   }
 
+  // ── Event handlers ─────────────────────────────────
   let debounceTimer;
   function handleSearch() {
     const query = searchInput.value.trim();
