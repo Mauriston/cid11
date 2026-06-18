@@ -28,6 +28,7 @@
       --md-outline-variant: #c7c5d0;
       --md-background: #f4f4f8;
       --md-error: #ba1a1a;
+      --md-fav: #e53935;
       --md-scrim: rgba(0,0,0,0.32);
       --md-elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
       --md-elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);
@@ -84,7 +85,6 @@
       line-height: 1;
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 28;
     }
-    .header-text {}
     .header-title {
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
@@ -136,9 +136,8 @@
       background: #ffffff;
       outline: 2px solid var(--md-primary);
     }
-    #search-input::placeholder {
-      color: var(--md-on-surface-variant);
-    }
+    #search-input::placeholder { color: var(--md-on-surface-variant); }
+
     #clear-btn {
       position: absolute;
       right: 8px;
@@ -161,11 +160,70 @@
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
     }
 
+    /* ── Filter tabs (Busca / Favoritos) ──────────── */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px 0;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .filter-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 18px;
+      border: 1px solid var(--md-outline-variant);
+      background: var(--md-surface);
+      color: var(--md-on-surface-variant);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 200ms var(--md-curve), color 200ms var(--md-curve), border-color 200ms var(--md-curve);
+    }
+    .filter-tab .material-symbols-outlined {
+      font-size: 18px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      transition: font-variation-settings 200ms var(--md-curve);
+    }
+    .filter-tab:hover {
+      background: rgba(5,15,65,0.06);
+      border-color: var(--md-outline);
+    }
+    .filter-tab.active {
+      background: var(--md-primary-container);
+      color: var(--md-on-primary-container);
+      border-color: var(--md-primary-container);
+      font-weight: 600;
+    }
+    .filter-tab.active .material-symbols-outlined {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20;
+    }
+    .fav-count {
+      display: none;
+      background: var(--md-fav);
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      padding: 0 5px;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .fav-count.visible { display: flex; }
+
     /* ── Main content ─────────────────────────────── */
     main {
       max-width: 800px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px 16px 16px;
     }
 
     #status-bar {
@@ -187,17 +245,13 @@
       padding: 64px 16px;
       gap: 20px;
     }
-
-    /* MD3-style circular progress — spinning arc */
     .md-circular-progress {
       width: 48px;
       height: 48px;
       animation: md-rotate 1.4s linear infinite;
     }
     .md-circular-progress circle {
-      cx: 24;
-      cy: 24;
-      r: 20;
+      cx: 24; cy: 24; r: 20;
       fill: none;
       stroke: var(--md-primary);
       stroke-width: 4;
@@ -211,14 +265,13 @@
       50%  { stroke-dasharray: 100 25; stroke-dashoffset: -30; }
       100% { stroke-dasharray: 100 25; stroke-dashoffset: -124; }
     }
-
     .loading-text {
       font-family: 'Carlito', sans-serif;
       color: var(--md-on-surface-variant);
       font-size: 0.95rem;
     }
 
-    /* ── Results grid ─────────────────────────────── */
+    /* ── Results ──────────────────────────────────── */
     #results {
       display: flex;
       flex-direction: column;
@@ -248,7 +301,6 @@
     .card:hover { box-shadow: var(--md-elevation-2); }
     .card:hover::after { opacity: 0.08; }
 
-    /* Ripple */
     .card .ripple {
       position: absolute;
       border-radius: 50%;
@@ -259,15 +311,13 @@
       pointer-events: none;
       z-index: 5;
     }
-    @keyframes ripple-expand {
-      to { transform: scale(4); opacity: 0; }
-    }
+    @keyframes ripple-expand { to { transform: scale(4); opacity: 0; } }
 
     .card-header {
       padding: 14px 16px 12px;
       display: flex;
       align-items: flex-start;
-      gap: 12px;
+      gap: 10px;
       min-height: 44px;
       position: relative;
       z-index: 1;
@@ -300,6 +350,34 @@
       line-height: 1.4;
       color: var(--md-on-surface);
       flex: 1;
+    }
+
+    /* ── Favorite button ──────────────────────────── */
+    .fav-btn {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--md-outline);
+      transition: background 200ms var(--md-curve), color 200ms var(--md-curve);
+      position: relative;
+      z-index: 2;
+    }
+    .fav-btn .material-symbols-outlined {
+      font-size: 20px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      transition: font-variation-settings 200ms var(--md-curve), color 200ms var(--md-curve);
+    }
+    .fav-btn:hover { background: rgba(229,57,53,0.1); color: var(--md-fav); }
+    .fav-btn.active { color: var(--md-fav); }
+    .fav-btn.active .material-symbols-outlined {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20;
     }
 
     .expand-icon {
@@ -338,10 +416,7 @@
       text-overflow: ellipsis;
       max-width: 140px;
     }
-    .breadcrumb-sep {
-      font-size: 0.7rem;
-      color: var(--md-outline-variant);
-    }
+    .breadcrumb-sep { font-size: 0.7rem; color: var(--md-outline-variant); }
 
     /* ── Description preview ──────────────────────── */
     .card-desc-preview {
@@ -360,7 +435,7 @@
     .card.expanded .card-desc-preview { display: none; }
     .card.expanded .card-breadcrumb   { display: none; }
 
-    /* ── Card details (expanded) ──────────────────── */
+    /* ── Card details (expanded, animated) ───────── */
     .card-details {
       max-height: 0;
       overflow: hidden;
@@ -372,9 +447,7 @@
       max-height: 2000px;
       border-top-width: 1px;
     }
-    .card-details-inner {
-      padding: 14px 16px;
-    }
+    .card-details-inner { padding: 14px 16px; }
 
     .detail-row {
       display: flex;
@@ -383,15 +456,9 @@
       padding-top: 14px;
       border-top: 1px solid var(--md-outline-variant);
     }
-    .detail-row:first-child {
-      padding-top: 0;
-      border-top: none;
-    }
+    .detail-row:first-child { padding-top: 0; border-top: none; }
 
-    .detail-body {
-      flex: 1;
-      min-width: 0;
-    }
+    .detail-body { flex: 1; min-width: 0; }
     .detail-label {
       font-family: 'Montserrat', sans-serif;
       font-size: 0.7rem;
@@ -415,7 +482,7 @@
       color: var(--md-primary);
     }
 
-    /* ── Copy button — MD3 Icon Button ───────────── */
+    /* ── Copy button ──────────────────────────────── */
     .copy-btn {
       flex-shrink: 0;
       width: 40px;
@@ -474,10 +541,7 @@
     }
 
     /* ── Welcome state ────────────────────────────── */
-    #welcome-state {
-      text-align: center;
-      padding: 40px 16px;
-    }
+    #welcome-state { text-align: center; padding: 40px 16px; }
     .welcome-icon {
       font-family: 'Material Symbols Outlined';
       font-size: 56px;
@@ -502,7 +566,6 @@
       margin: 0 auto;
     }
 
-    /* ── Stat chips — MD3 Suggestion chips ───────── */
     .stat-chips {
       display: flex;
       flex-wrap: wrap;
@@ -521,7 +584,6 @@
       border: 1px solid var(--md-outline-variant);
     }
 
-    /* ── Highlight ────────────────────────────────── */
     mark {
       background: #fff176;
       color: inherit;
@@ -545,7 +607,7 @@
       font-weight: 500;
       letter-spacing: 0.1px;
       cursor: pointer;
-      transition: background 200ms var(--md-curve), border-color 200ms var(--md-curve);
+      transition: background 200ms var(--md-curve);
     }
     #load-more:hover { background: rgba(5,15,65,0.08); }
     #load-more.visible { display: block; }
@@ -554,11 +616,13 @@
     @media (min-width: 600px) {
       header { padding: 16px 24px 18px; }
       .header-title { font-size: 1.25rem; }
-      main { padding: 20px 24px; }
+      main { padding: 12px 24px 20px; }
+      .filter-tabs { padding: 12px 24px 0; }
     }
     @media (min-width: 800px) {
       header { padding: 16px 32px 18px; }
-      main { padding: 24px 32px; }
+      main { padding: 12px 32px 24px; }
+      .filter-tabs { padding: 12px 32px 0; }
     }
   </style>
 </head>
@@ -569,7 +633,7 @@
 <header id="app-header">
   <div class="header-top">
     <span class="header-icon material-symbols-outlined">monitor_heart</span>
-    <div class="header-text">
+    <div>
       <div class="header-title">CID-11</div>
       <div class="header-subtitle">Classificação Internacional de Doenças</div>
     </div>
@@ -593,6 +657,19 @@
     </button>
   </div>
 </header>
+
+<!-- Filter tabs -->
+<div class="filter-tabs">
+  <button class="filter-tab active" id="tab-search" aria-pressed="true">
+    <span class="material-symbols-outlined">search</span>
+    Busca
+  </button>
+  <button class="filter-tab" id="tab-favs" aria-pressed="false">
+    <span class="material-symbols-outlined">favorite</span>
+    Favoritos
+    <span class="fav-count" id="fav-count">0</span>
+  </button>
+</div>
 
 <main>
   <div id="status-bar"></div>
@@ -625,11 +702,49 @@
 (function () {
   'use strict';
 
-  let allItems = [];
-  let filtered = [];
+  let allItems  = [];
+  let filtered  = [];
   let displayCount = 30;
-  const PAGE_SIZE = 30;
+  const PAGE_SIZE  = 30;
 
+  // 'search' | 'favs'
+  let activeTab = 'search';
+
+  // Favorites — persisted in localStorage as a Set of keys (cid ?? name)
+  const FAV_KEY = 'cid11_favs_v1';
+  let favorites = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+
+  function saveFavs() {
+    localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
+  }
+
+  function itemKey(item) {
+    return item.cid || item.name;
+  }
+
+  function isFav(item) {
+    return favorites.has(itemKey(item));
+  }
+
+  function toggleFav(item) {
+    const k = itemKey(item);
+    if (favorites.has(k)) {
+      favorites.delete(k);
+    } else {
+      favorites.add(k);
+    }
+    saveFavs();
+    updateFavCount();
+  }
+
+  function updateFavCount() {
+    const countEl = document.getElementById('fav-count');
+    const n = favorites.size;
+    countEl.textContent = n;
+    countEl.classList.toggle('visible', n > 0);
+  }
+
+  // ── DOM refs ───────────────────────────────────────
   const searchInput  = document.getElementById('search-input');
   const clearBtn     = document.getElementById('clear-btn');
   const loadingEl    = document.getElementById('loading');
@@ -641,11 +756,13 @@
   const loadMoreBtn  = document.getElementById('load-more');
   const progressFill = document.getElementById('progress-fill');
   const statChips    = document.getElementById('stat-chips');
+  const tabSearch    = document.getElementById('tab-search');
+  const tabFavs      = document.getElementById('tab-favs');
 
   const COPY_ICON  = `<span class="material-symbols-outlined">content_copy</span>`;
   const CHECK_ICON = `<span class="material-symbols-outlined">check</span>`;
 
-  // Sticky header shadow on scroll
+  // Sticky header shadow
   window.addEventListener('scroll', () => {
     document.getElementById('app-header').classList.toggle('scrolled', window.scrollY > 4);
   }, { passive: true });
@@ -654,11 +771,7 @@
   function stripAccents(s) {
     return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   }
-
-  function lowerOnly(s) {
-    return s.toLowerCase();
-  }
-
+  function lowerOnly(s) { return s.toLowerCase(); }
   function hasAccents(s) {
     return s.normalize('NFD') !== s.normalize('NFD').replace(/[̀-ͯ]/g, '');
   }
@@ -699,6 +812,7 @@
         `${allItems.length.toLocaleString('pt-BR')} itens`,
         `${withCid.toLocaleString('pt-BR')} com código CID`,
       ].map(s => `<span class="stat-chip">${s}</span>`).join('');
+      updateFavCount();
       showWelcome();
     } catch (err) {
       loadingEl.innerHTML = `<div style="color:var(--md-error);text-align:center;padding:16px"><strong>Erro ao carregar data.json</strong><br><small>${err.message}</small></div>`;
@@ -707,19 +821,21 @@
 
   // ── UI helpers ─────────────────────────────────────
   function showWelcome() {
-    loadingEl.style.display = 'none';
-    welcomeEl.style.display = 'block';
+    loadingEl.style.display  = 'none';
+    welcomeEl.style.display  = 'block';
     emptyEl.classList.remove('visible');
     loadMoreBtn.classList.remove('visible');
     statusBar.textContent = '';
+    resultsEl.innerHTML = '';
   }
 
-  function showEmpty(query) {
+  function showEmpty(msg) {
     welcomeEl.style.display = 'none';
     emptyEl.classList.add('visible');
-    emptySubEl.textContent = `Nenhum resultado para "${query}"`;
+    emptySubEl.textContent = msg;
     loadMoreBtn.classList.remove('visible');
     statusBar.textContent = '';
+    resultsEl.innerHTML = '';
   }
 
   function showResults() {
@@ -731,19 +847,15 @@
   function search(query) {
     const terms = query.trim().split(/\s+/).filter(Boolean);
     if (!terms.length) return allItems.slice();
-
     return allItems.filter(item => {
       const haystack     = [item.name, item.cid || ''].join(' ');
       const haystackLow  = lowerOnly(haystack);
       const haystackFlat = stripAccents(haystack);
-
-      return terms.every(term => {
-        if (hasAccents(term)) {
-          return haystackLow.includes(lowerOnly(term));
-        } else {
-          return haystackFlat.includes(stripAccents(term));
-        }
-      });
+      return terms.every(term =>
+        hasAccents(term)
+          ? haystackLow.includes(lowerOnly(term))
+          : haystackFlat.includes(stripAccents(term))
+      );
     });
   }
 
@@ -760,8 +872,7 @@
     if (!terms.length) return escHtml(text);
     let result = escHtml(text);
     for (const term of terms) {
-      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = new RegExp(escaped, 'gi');
+      const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
       result = result.replace(re, m => `<mark>${m}</mark>`);
     }
     return result;
@@ -774,15 +885,23 @@
     for (const item of slice) frag.appendChild(buildCard(item, query));
     resultsEl.innerHTML = '';
     resultsEl.appendChild(frag);
+
     if (filtered.length > displayCount) {
       loadMoreBtn.textContent = `Carregar mais (${filtered.length - displayCount} restantes)`;
       loadMoreBtn.classList.add('visible');
     } else {
       loadMoreBtn.classList.remove('visible');
     }
-    statusBar.textContent = query && filtered.length
-      ? `${filtered.length.toLocaleString('pt-BR')} resultado${filtered.length !== 1 ? 's' : ''}`
-      : '';
+
+    if (activeTab === 'favs') {
+      statusBar.textContent = filtered.length
+        ? `${filtered.length} favorito${filtered.length !== 1 ? 's' : ''}`
+        : '';
+    } else {
+      statusBar.textContent = query && filtered.length
+        ? `${filtered.length.toLocaleString('pt-BR')} resultado${filtered.length !== 1 ? 's' : ''}`
+        : '';
+    }
   }
 
   function buildCard(item, query) {
@@ -792,6 +911,7 @@
     const badgeClass = item.cid ? 'cid-badge' : 'cid-badge category';
     const badgeText  = item.cid ? escHtml(item.cid) : 'CAT';
     const nameHtml   = highlight(item.name, query);
+    const favActive  = isFav(item) ? ' active' : '';
 
     const descPreview = item.description
       ? `<div class="card-desc-preview">${escHtml(item.description.slice(0, 220))}${item.description.length > 220 ? '…' : ''}</div>`
@@ -823,6 +943,9 @@
       <div class="card-header">
         <span class="${badgeClass}">${badgeText}</span>
         <span class="card-name">${nameHtml}</span>
+        <button class="fav-btn${favActive}" title="Favoritar" aria-label="Favoritar">
+          <span class="material-symbols-outlined">favorite</span>
+        </button>
         <span class="expand-icon material-symbols-outlined">keyboard_arrow_down</span>
       </div>
       ${breadcrumbHtml}
@@ -830,9 +953,34 @@
       <div class="card-details"><div class="card-details-inner">${detailsHtml}</div></div>
     `;
 
+    // Favorite button
+    const favBtn = card.querySelector('.fav-btn');
+    favBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFav(item);
+      favBtn.classList.toggle('active', isFav(item));
+      // If we're in favs tab and item was un-favorited, remove card with animation
+      if (activeTab === 'favs' && !isFav(item)) {
+        card.style.transition = 'opacity 200ms, transform 200ms';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.96)';
+        setTimeout(() => {
+          card.remove();
+          // Update filtered list and status
+          filtered = allItems.filter(i => isFav(i));
+          statusBar.textContent = filtered.length
+            ? `${filtered.length} favorito${filtered.length !== 1 ? 's' : ''}`
+            : '';
+          if (filtered.length === 0) {
+            showEmpty('Nenhuma doença favoritada ainda');
+          }
+        }, 200);
+      }
+    });
+
+    // Expand / collapse
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.copy-btn')) return;
-      // Ripple effect
+      if (e.target.closest('.fav-btn') || e.target.closest('.copy-btn')) return;
       const rect = card.getBoundingClientRect();
       const ripple = document.createElement('span');
       ripple.className = 'ripple';
@@ -843,16 +991,14 @@
       card.classList.toggle('expanded');
     });
 
+    // Copy buttons
     card.querySelectorAll('.copy-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         navigator.clipboard.writeText(btn.dataset.copy).then(() => {
           btn.classList.add('copied');
           btn.innerHTML = CHECK_ICON;
-          setTimeout(() => {
-            btn.classList.remove('copied');
-            btn.innerHTML = COPY_ICON;
-          }, 1500);
+          setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = COPY_ICON; }, 1500);
         });
       });
     });
@@ -860,23 +1006,51 @@
     return card;
   }
 
-  // ── Event handlers ─────────────────────────────────
+  // ── Tab switching ──────────────────────────────────
+  function setTab(tab) {
+    activeTab = tab;
+    tabSearch.classList.toggle('active', tab === 'search');
+    tabSearch.setAttribute('aria-pressed', tab === 'search');
+    tabFavs.classList.toggle('active', tab === 'favs');
+    tabFavs.setAttribute('aria-pressed', tab === 'favs');
+
+    displayCount = PAGE_SIZE;
+
+    if (tab === 'favs') {
+      searchInput.value = '';
+      clearBtn.classList.remove('visible');
+      filtered = allItems.filter(i => isFav(i));
+      if (filtered.length === 0) {
+        showEmpty('Nenhuma doença favoritada ainda');
+      } else {
+        showResults();
+        renderCards('');
+      }
+    } else {
+      // Back to search — show welcome
+      filtered = [];
+      showWelcome();
+    }
+  }
+
+  tabSearch.addEventListener('click', () => setTab('search'));
+  tabFavs.addEventListener('click',   () => setTab('favs'));
+
+  // ── Search handler ─────────────────────────────────
   let debounceTimer;
   function handleSearch() {
+    if (activeTab !== 'search') return;
     const query = searchInput.value.trim();
     clearBtn.classList.toggle('visible', query.length > 0);
     if (!query) {
       displayCount = PAGE_SIZE;
-      resultsEl.innerHTML = '';
-      loadMoreBtn.classList.remove('visible');
       showWelcome();
       return;
     }
     filtered = search(query);
     displayCount = PAGE_SIZE;
     if (filtered.length === 0) {
-      resultsEl.innerHTML = '';
-      showEmpty(query);
+      showEmpty(`Nenhum resultado para "${query}"`);
     } else {
       showResults();
       renderCards(query);
@@ -884,6 +1058,7 @@
   }
 
   searchInput.addEventListener('input', () => {
+    if (activeTab !== 'search') setTab('search');
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(handleSearch, 200);
   });
@@ -897,7 +1072,7 @@
 
   loadMoreBtn.addEventListener('click', () => {
     displayCount += PAGE_SIZE;
-    renderCards(searchInput.value.trim());
+    renderCards(activeTab === 'favs' ? '' : searchInput.value.trim());
   });
 
   loadData();
