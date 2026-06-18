@@ -277,6 +277,9 @@
     }
 
     /* ── EXPANDED DETAILS ───────────────────────────── */
+    .card.expanded .card-desc-preview { display: none; }
+    .card.expanded .card-breadcrumb   { display: none; }
+
     .card-details {
       display: none;
       border-top: 1px solid var(--border);
@@ -286,22 +289,34 @@
 
     .card.expanded .card-details { display: block; }
 
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .detail-row:first-child { margin-top: 0; }
+
+    .detail-body {
+      flex: 1;
+      min-width: 0;
+    }
+
     .detail-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--text-secondary);
-      margin-bottom: 4px;
-      margin-top: 12px;
+      margin-bottom: 3px;
     }
-
-    .detail-label:first-child { margin-top: 0; }
 
     .detail-value {
       font-size: 0.9rem;
       color: var(--text-primary);
       line-height: 1.6;
+      word-break: break-word;
     }
 
     .detail-cid {
@@ -311,25 +326,30 @@
       color: var(--primary);
     }
 
-    .detail-path {
+    .copy-btn {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
       align-items: center;
-    }
-
-    .path-item {
-      font-size: 0.8rem;
+      justify-content: center;
       color: var(--text-secondary);
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      padding: 3px 8px;
-      border-radius: 4px;
+      transition: background 0.15s, color 0.15s;
+      align-self: flex-start;
+      margin-top: 16px;
     }
 
-    .path-sep {
-      color: var(--border);
-      font-size: 0.75rem;
+    .detail-row:first-child .copy-btn { margin-top: 0; }
+
+    .copy-btn:hover { background: var(--border); color: var(--primary); }
+
+    .copy-btn.copied {
+      color: #2e7d32;
+      background: #e8f5e9;
     }
 
     /* ── EMPTY STATE ────────────────────────────────── */
@@ -471,7 +491,7 @@
       autocorrect="off"
       autocapitalize="off"
       spellcheck="false"
-      placeholder="Buscar CID, doença ou descrição…"
+      placeholder="Buscar por código CID ou nome da doença…"
       aria-label="Buscar CID-11"
     >
     <button class="clear-btn" id="clear-btn" aria-label="Limpar busca">
@@ -493,7 +513,7 @@
   <div id="welcome-state" style="display:none">
     <div class="welcome-icon">🏥</div>
     <h2>Busca CID-11 em Português</h2>
-    <p>Pesquise por código CID, nome da doença ou descrição clínica na Classificação Internacional de Doenças — 11ª Revisão.</p>
+    <p>Pesquise por código CID ou nome da doença na Classificação Internacional de Doenças — 11ª Revisão.</p>
     <div class="stat-chips" id="stat-chips"></div>
   </div>
 
@@ -718,10 +738,8 @@
         }</div>`
       : '';
 
-    // Full path in details
-    const fullPathHtml = item.path.length
-      ? item.path.map(p => `<span class="path-item">${escHtml(p)}</span>`).join('<span class="path-sep"> › </span>')
-      : '<span style="color:var(--text-secondary);font-size:0.85rem">Categoria raiz</span>';
+    const copyIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+    const checkIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 
     card.innerHTML = `
       <div class="card-header">
@@ -734,17 +752,50 @@
       ${breadcrumbHtml}
       ${descPreview}
       <div class="card-details">
-        ${item.cid ? `<div class="detail-label">Código CID-11</div><div class="detail-value detail-cid">${escHtml(item.cid)}</div>` : ''}
-        <div class="detail-label">Nome</div>
-        <div class="detail-value">${escHtml(item.name)}</div>
-        ${item.description ? `<div class="detail-label">Descrição</div><div class="detail-value">${escHtml(item.description)}</div>` : ''}
-        <div class="detail-label">Hierarquia</div>
-        <div class="detail-value detail-path">${fullPathHtml}</div>
+        ${item.cid ? `
+        <div class="detail-row">
+          <div class="detail-body">
+            <div class="detail-label">Código CID-11</div>
+            <div class="detail-value detail-cid">${escHtml(item.cid)}</div>
+          </div>
+          <button class="copy-btn" data-copy="${escHtml(item.cid)}" title="Copiar código">${copyIcon}</button>
+        </div>` : ''}
+        <div class="detail-row">
+          <div class="detail-body">
+            <div class="detail-label">Nome</div>
+            <div class="detail-value">${escHtml(item.name)}</div>
+          </div>
+          <button class="copy-btn" data-copy="${escHtml(item.name)}" title="Copiar nome">${copyIcon}</button>
+        </div>
+        ${item.description ? `
+        <div class="detail-row">
+          <div class="detail-body">
+            <div class="detail-label">Descrição</div>
+            <div class="detail-value">${escHtml(item.description)}</div>
+          </div>
+          <button class="copy-btn" data-copy="${escHtml(item.description)}" title="Copiar descrição">${copyIcon}</button>
+        </div>` : ''}
       </div>
     `;
 
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.copy-btn')) return;
       card.classList.toggle('expanded');
+    });
+
+    card.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = btn.dataset.copy;
+        navigator.clipboard.writeText(text).then(() => {
+          btn.classList.add('copied');
+          btn.innerHTML = checkIcon;
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = copyIcon;
+          }, 1500);
+        });
+      });
     });
 
     return card;
