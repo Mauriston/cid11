@@ -29,7 +29,6 @@
       min-height: 100vh;
     }
 
-    /* ── HEADER ─────────────────────────────────────── */
     header {
       position: sticky;
       top: 0;
@@ -50,9 +49,7 @@
       gap: 8px;
     }
 
-    .header-title svg {
-      flex-shrink: 0;
-    }
+    .header-title svg { flex-shrink: 0; }
 
     .search-box {
       position: relative;
@@ -82,13 +79,8 @@
       transition: box-shadow 0.2s;
     }
 
-    #search-input:focus {
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
-    }
-
-    #search-input::placeholder {
-      color: var(--text-secondary);
-    }
+    #search-input:focus { box-shadow: 0 0 0 3px rgba(255,255,255,0.5); }
+    #search-input::placeholder { color: var(--text-secondary); }
 
     .clear-btn {
       position: absolute;
@@ -99,25 +91,22 @@
       background: transparent;
       cursor: pointer;
       border-radius: 50%;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       color: var(--text-secondary);
       transition: background 0.15s;
-      display: none;
     }
 
     .clear-btn:hover { background: var(--border); }
     .clear-btn.visible { display: flex; }
 
-    /* ── MAIN CONTENT ───────────────────────────────── */
     main {
       max-width: 800px;
       margin: 0 auto;
       padding: 16px;
     }
 
-    /* ── STATUS BAR ─────────────────────────────────── */
     #status-bar {
       font-size: 0.85rem;
       color: var(--text-secondary);
@@ -125,10 +114,8 @@
       min-height: 20px;
       display: flex;
       align-items: center;
-      gap: 6px;
     }
 
-    /* ── LOADING ────────────────────────────────────── */
     #loading {
       display: flex;
       flex-direction: column;
@@ -149,12 +136,8 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .loading-text {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
+    .loading-text { color: var(--text-secondary); font-size: 0.95rem; }
 
-    /* ── PROGRESS BAR ───────────────────────────────── */
     #progress-bar {
       width: 100%;
       height: 3px;
@@ -172,14 +155,12 @@
       transition: width 0.3s ease;
     }
 
-    /* ── RESULTS ────────────────────────────────────── */
     #results {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    /* ── CARD ───────────────────────────────────────── */
     .card {
       background: var(--surface);
       border-radius: var(--radius);
@@ -189,10 +170,7 @@
       cursor: pointer;
     }
 
-    .card:hover {
-      box-shadow: var(--shadow-hover);
-    }
-
+    .card:hover { box-shadow: var(--shadow-hover); }
     .card:active { transform: scale(0.995); }
 
     .card-header {
@@ -220,7 +198,6 @@
     .cid-badge.category {
       background: #546e7a;
       font-size: 0.7rem;
-      letter-spacing: 0.3px;
     }
 
     .card-name {
@@ -260,10 +237,7 @@
       max-width: 140px;
     }
 
-    .breadcrumb-sep {
-      font-size: 0.7rem;
-      color: var(--border);
-    }
+    .breadcrumb-sep { font-size: 0.7rem; color: var(--border); }
 
     .card-desc-preview {
       padding: 0 16px 14px;
@@ -276,7 +250,10 @@
       overflow: hidden;
     }
 
-    /* ── EXPANDED DETAILS ───────────────────────────── */
+    /* When expanded, hide preview and breadcrumb */
+    .card.expanded .card-desc-preview { display: none; }
+    .card.expanded .card-breadcrumb   { display: none; }
+
     .card-details {
       display: none;
       border-top: 1px solid var(--border);
@@ -286,22 +263,34 @@
 
     .card.expanded .card-details { display: block; }
 
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .detail-row:first-child { margin-top: 0; }
+
+    .detail-body {
+      flex: 1;
+      min-width: 0;
+    }
+
     .detail-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--text-secondary);
-      margin-bottom: 4px;
-      margin-top: 12px;
+      margin-bottom: 3px;
     }
-
-    .detail-label:first-child { margin-top: 0; }
 
     .detail-value {
       font-size: 0.9rem;
       color: var(--text-primary);
       line-height: 1.6;
+      word-break: break-word;
     }
 
     .detail-cid {
@@ -311,28 +300,27 @@
       color: var(--primary);
     }
 
-    .detail-path {
+    .copy-btn {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
       align-items: center;
-    }
-
-    .path-item {
-      font-size: 0.8rem;
+      justify-content: center;
       color: var(--text-secondary);
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      padding: 3px 8px;
-      border-radius: 4px;
+      transition: background 0.15s, color 0.15s;
+      align-self: flex-start;
+      margin-top: 16px;
     }
 
-    .path-sep {
-      color: var(--border);
-      font-size: 0.75rem;
-    }
+    .detail-row:first-child .copy-btn { margin-top: 0; }
+    .copy-btn:hover { background: var(--border); color: var(--primary); }
+    .copy-btn.copied { color: #2e7d32; background: #e8f5e9; }
 
-    /* ── EMPTY STATE ────────────────────────────────── */
     #empty-state {
       display: none;
       flex-direction: column;
@@ -344,48 +332,14 @@
     }
 
     #empty-state.visible { display: flex; }
+    .empty-icon { font-size: 3rem; opacity: 0.3; }
+    .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); }
+    .empty-subtitle { font-size: 0.9rem; color: var(--text-secondary); opacity: 0.7; }
 
-    .empty-icon {
-      font-size: 3rem;
-      opacity: 0.3;
-    }
-
-    .empty-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .empty-subtitle {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      opacity: 0.7;
-    }
-
-    /* ── WELCOME STATE ──────────────────────────────── */
-    #welcome-state {
-      text-align: center;
-      padding: 40px 16px;
-    }
-
-    #welcome-state .welcome-icon {
-      font-size: 3.5rem;
-      margin-bottom: 12px;
-    }
-
-    #welcome-state h2 {
-      color: var(--primary);
-      font-size: 1.25rem;
-      margin-bottom: 8px;
-    }
-
-    #welcome-state p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      max-width: 400px;
-      margin: 0 auto;
-    }
+    #welcome-state { text-align: center; padding: 40px 16px; }
+    #welcome-state .welcome-icon { font-size: 3.5rem; margin-bottom: 12px; }
+    #welcome-state h2 { color: var(--primary); font-size: 1.25rem; margin-bottom: 8px; }
+    #welcome-state p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 400px; margin: 0 auto; }
 
     .stat-chips {
       display: flex;
@@ -404,7 +358,6 @@
       font-weight: 500;
     }
 
-    /* ── HIGHLIGHT ──────────────────────────────────── */
     mark {
       background: #fff176;
       color: inherit;
@@ -412,7 +365,6 @@
       padding: 0 1px;
     }
 
-    /* ── LOAD MORE ──────────────────────────────────── */
     #load-more {
       display: none;
       width: 100%;
@@ -428,13 +380,9 @@
       transition: background 0.15s, color 0.15s;
     }
 
-    #load-more:hover {
-      background: var(--primary-light);
-    }
-
+    #load-more:hover { background: var(--primary-light); }
     #load-more.visible { display: block; }
 
-    /* ── DESKTOP ────────────────────────────────────── */
     @media (min-width: 600px) {
       header { padding: 16px 24px 18px; }
       .header-title { font-size: 1.2rem; margin-bottom: 12px; }
@@ -511,96 +459,70 @@
 (function () {
   'use strict';
 
-  // ── State ──────────────────────────────────────────
-  let allItems = [];      // flattened items
-  let filtered = [];      // current filtered list
-  let displayCount = 30;  // how many cards are shown
+  let allItems = [];
+  let filtered = [];
+  let displayCount = 30;
   const PAGE_SIZE = 30;
 
-  // ── DOM refs ───────────────────────────────────────
-  const searchInput   = document.getElementById('search-input');
-  const clearBtn      = document.getElementById('clear-btn');
-  const loadingEl     = document.getElementById('loading');
-  const welcomeEl     = document.getElementById('welcome-state');
-  const emptyEl       = document.getElementById('empty-state');
-  const emptySubEl    = document.getElementById('empty-subtitle');
-  const resultsEl     = document.getElementById('results');
-  const statusBar     = document.getElementById('status-bar');
-  const loadMoreBtn   = document.getElementById('load-more');
-  const progressFill  = document.getElementById('progress-fill');
-  const statChips     = document.getElementById('stat-chips');
+  const searchInput  = document.getElementById('search-input');
+  const clearBtn     = document.getElementById('clear-btn');
+  const loadingEl    = document.getElementById('loading');
+  const welcomeEl    = document.getElementById('welcome-state');
+  const emptyEl      = document.getElementById('empty-state');
+  const emptySubEl   = document.getElementById('empty-subtitle');
+  const resultsEl    = document.getElementById('results');
+  const statusBar    = document.getElementById('status-bar');
+  const loadMoreBtn  = document.getElementById('load-more');
+  const progressFill = document.getElementById('progress-fill');
+  const statChips    = document.getElementById('stat-chips');
 
-  // ── Flatten hierarchy ──────────────────────────────
+  const COPY_ICON  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  const CHECK_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
   function flattenData(obj, path) {
     const items = [];
     for (const name of Object.keys(obj)) {
       const node = obj[name];
       if (!node || typeof node !== 'object') continue;
-
       const cid = (node.cid !== null && node.cid !== undefined && !Number.isNaN(node.cid))
-        ? String(node.cid).trim()
-        : null;
+        ? String(node.cid).trim() : null;
       const desc = (node.description !== null && node.description !== undefined && !Number.isNaN(node.description))
-        ? String(node.description).trim()
-        : '';
-
-      const item = {
-        name: name.trim(),
-        cid,
-        description: desc,
-        path: [...path],
-      };
-
-      items.push(item);
-
+        ? String(node.description).trim() : '';
+      items.push({ name: name.trim(), cid, description: desc, path: [...path] });
       if (node.subitens && typeof node.subitens === 'object') {
-        const children = flattenData(node.subitens, [...path, name.trim()]);
-        for (const c of children) items.push(c);
+        for (const c of flattenData(node.subitens, [...path, name.trim()])) items.push(c);
       }
     }
     return items;
   }
 
-  // ── Load data ──────────────────────────────────────
   async function loadData() {
     try {
       progressFill.style.width = '20%';
       const resp = await fetch('./data.json');
       progressFill.style.width = '60%';
-
       const text = await resp.text();
       progressFill.style.width = '80%';
-
-      // Replace bare NaN (Python artifact) with null
       const sanitized = text.replace(/:\s*NaN\b/g, ': null');
       const data = JSON.parse(sanitized);
-
       progressFill.style.width = '95%';
       allItems = flattenData(data, []);
       progressFill.style.width = '100%';
-
       setTimeout(() => { progressFill.style.width = '0%'; }, 400);
-
-      // Stats
       const withCid = allItems.filter(i => i.cid).length;
       statChips.innerHTML = [
         `${allItems.length.toLocaleString('pt-BR')} itens`,
         `${withCid.toLocaleString('pt-BR')} com código CID`,
       ].map(s => `<span class="stat-chip">${s}</span>`).join('');
-
       showWelcome();
     } catch (err) {
-      loadingEl.innerHTML = `<div style="color:#c62828;text-align:center;padding:16px">
-        <strong>Erro ao carregar data.json</strong><br>
-        <small>${err.message}</small>
-      </div>`;
+      loadingEl.innerHTML = `<div style="color:#c62828;text-align:center;padding:16px"><strong>Erro ao carregar data.json</strong><br><small>${err.message}</small></div>`;
     }
   }
 
-  // ── UI State helpers ───────────────────────────────
   function showWelcome() {
-    loadingEl.style.display  = 'none';
-    welcomeEl.style.display  = 'block';
+    loadingEl.style.display = 'none';
+    welcomeEl.style.display = 'block';
     emptyEl.classList.remove('visible');
     loadMoreBtn.classList.remove('visible');
     statusBar.textContent = '';
@@ -614,12 +536,11 @@
     statusBar.textContent = '';
   }
 
-  function showResults(query) {
+  function showResults() {
     welcomeEl.style.display = 'none';
     emptyEl.classList.remove('visible');
   }
 
-  // ── Search ─────────────────────────────────────────
   function normalize(s) {
     return s.toLowerCase()
       .normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -627,24 +548,24 @@
   }
 
   function search(query) {
-    const q = normalize(query);
-    const terms = q.split(/\s+/).filter(Boolean);
+    const terms = normalize(query).split(/\s+/).filter(Boolean);
     if (!terms.length) return allItems.slice();
-
     return allItems.filter(item => {
-      const haystack = normalize(
-        [item.name, item.cid || ''].join(' ')
-      );
-      return terms.every(t => haystack.includes(t));
+      const h = normalize([item.name, item.cid || ''].join(' '));
+      return terms.every(t => h.includes(t));
     });
   }
 
-  // ── Highlight ──────────────────────────────────────
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function highlight(text, query) {
     if (!query || !text) return escHtml(text || '');
     const terms = normalize(query).split(/\s+/).filter(Boolean);
     if (!terms.length) return escHtml(text);
-
     let result = escHtml(text);
     for (const term of terms) {
       const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
@@ -653,44 +574,21 @@
     return result;
   }
 
-  function escHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  // ── Render cards ───────────────────────────────────
   function renderCards(query) {
     const slice = filtered.slice(0, displayCount);
     const frag = document.createDocumentFragment();
-
-    for (const item of slice) {
-      const card = buildCard(item, query);
-      frag.appendChild(card);
-    }
-
+    for (const item of slice) frag.appendChild(buildCard(item, query));
     resultsEl.innerHTML = '';
     resultsEl.appendChild(frag);
-
-    // Load more
     if (filtered.length > displayCount) {
       loadMoreBtn.textContent = `Carregar mais (${filtered.length - displayCount} restantes)`;
       loadMoreBtn.classList.add('visible');
     } else {
       loadMoreBtn.classList.remove('visible');
     }
-
-    // Status
-    if (query) {
-      statusBar.textContent =
-        filtered.length === 0
-          ? ''
-          : `${filtered.length.toLocaleString('pt-BR')} resultado${filtered.length !== 1 ? 's' : ''}`;
-    } else {
-      statusBar.textContent = '';
-    }
+    statusBar.textContent = query && filtered.length
+      ? `${filtered.length.toLocaleString('pt-BR')} resultado${filtered.length !== 1 ? 's' : ''}`
+      : '';
   }
 
   function buildCard(item, query) {
@@ -699,27 +597,33 @@
 
     const badgeClass = item.cid ? 'cid-badge' : 'cid-badge category';
     const badgeText  = item.cid ? escHtml(item.cid) : 'CAT';
+    const nameHtml   = highlight(item.name, query);
 
-    const nameHtml = highlight(item.name, query);
     const descPreview = item.description
       ? `<div class="card-desc-preview">${escHtml(item.description.slice(0, 220))}${item.description.length > 220 ? '…' : ''}</div>`
       : '';
 
-    // Breadcrumb (show last 3 path items)
     const pathSlice = item.path.slice(-3);
     const breadcrumbHtml = pathSlice.length
-      ? `<div class="card-breadcrumb">${
-          pathSlice.map((p, i) =>
-            (i > 0 ? '<span class="breadcrumb-sep">›</span>' : '') +
-            `<span class="breadcrumb-item" title="${escHtml(p)}">${escHtml(p)}</span>`
-          ).join('')
-        }</div>`
+      ? `<div class="card-breadcrumb">${pathSlice.map((p, i) =>
+          (i > 0 ? '<span class="breadcrumb-sep">›</span>' : '') +
+          `<span class="breadcrumb-item" title="${escHtml(p)}">${escHtml(p)}</span>`
+        ).join('')}</div>`
       : '';
 
-    // Full path in details
-    const fullPathHtml = item.path.length
-      ? item.path.map(p => `<span class="path-item">${escHtml(p)}</span>`).join('<span class="path-sep"> › </span>')
-      : '<span style="color:var(--text-secondary);font-size:0.85rem">Categoria raiz</span>';
+    const detailRows = [];
+    if (item.cid) detailRows.push({ label: 'Código CID-11', value: item.cid, cls: 'detail-cid' });
+    detailRows.push({ label: 'Nome', value: item.name, cls: '' });
+    if (item.description) detailRows.push({ label: 'Descrição', value: item.description, cls: '' });
+
+    const detailsHtml = detailRows.map(r => `
+      <div class="detail-row">
+        <div class="detail-body">
+          <div class="detail-label">${r.label}</div>
+          <div class="detail-value ${r.cls}">${escHtml(r.value)}</div>
+        </div>
+        <button class="copy-btn" data-copy="${escHtml(r.value)}" title="Copiar ${r.label.toLowerCase()}">${COPY_ICON}</button>
+      </div>`).join('');
 
     card.innerHTML = `
       <div class="card-header">
@@ -731,36 +635,35 @@
       </div>
       ${breadcrumbHtml}
       ${descPreview}
-      <div class="card-details">
-        ${item.cid ? `<div class="detail-label">Código CID-11</div><div class="detail-value detail-cid">${escHtml(item.cid)}</div>` : ''}
-        <div class="detail-label">Nome</div>
-        <div class="detail-value">${escHtml(item.name)}</div>
-        ${item.description ? `<div class="detail-label">Descrição</div><div class="detail-value">${escHtml(item.description)}</div>` : ''}
-        <div class="detail-label">Hierarquia</div>
-        <div class="detail-value detail-path">${fullPathHtml}</div>
-      </div>
+      <div class="card-details">${detailsHtml}</div>
     `;
 
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.copy-btn')) return;
       card.classList.toggle('expanded');
+    });
+
+    card.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(btn.dataset.copy).then(() => {
+          btn.classList.add('copied');
+          btn.innerHTML = CHECK_ICON;
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = COPY_ICON;
+          }, 1500);
+        });
+      });
     });
 
     return card;
   }
 
-  // ── Debounce ───────────────────────────────────────
   let debounceTimer;
-  function debounce(fn, delay) {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(fn, delay);
-  }
-
-  // ── Search handler ─────────────────────────────────
   function handleSearch() {
     const query = searchInput.value.trim();
-
     clearBtn.classList.toggle('visible', query.length > 0);
-
     if (!query) {
       displayCount = PAGE_SIZE;
       resultsEl.innerHTML = '';
@@ -768,22 +671,20 @@
       showWelcome();
       return;
     }
-
     filtered = search(query);
     displayCount = PAGE_SIZE;
-
     if (filtered.length === 0) {
       resultsEl.innerHTML = '';
       showEmpty(query);
     } else {
-      showResults(query);
+      showResults();
       renderCards(query);
     }
   }
 
-  // ── Event listeners ────────────────────────────────
   searchInput.addEventListener('input', () => {
-    debounce(handleSearch, 200);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(handleSearch, 200);
   });
 
   clearBtn.addEventListener('click', () => {
@@ -798,9 +699,7 @@
     renderCards(searchInput.value.trim());
   });
 
-  // ── Boot ───────────────────────────────────────────
   loadData();
-
 })();
 </script>
 </body>
